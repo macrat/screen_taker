@@ -10,6 +10,19 @@ import finder
 with open('f.pickle', 'rb') as fp:
     f = pickle.load(fp)
 
+
+coefficient = f.a - f.a.min()
+coefficient /= coefficient.max()
+coefficient *= 255
+cv2.imwrite('coefficient.jpg', coefficient.get().astype(numpy.uint8))
+
+
+bias = f.b - f.b.min()
+bias /= bias.max()
+bias *= 255
+cv2.imwrite('bias.jpg', bias.get().astype(numpy.uint8))
+
+
 xs = numpy.array([numpy.ones(f.a.shape) * i for i in range(256)], numpy.uint8)
 ys = numpy.array([f(cupy.array(x)).get() for x in xs], numpy.uint8)
 
@@ -31,4 +44,4 @@ print()
 
 graph = graph.get()
 graph[graph > 255] = 255
-cv2.imwrite('out.jpg', graph.astype(numpy.uint8))
+cv2.imwrite('color_lines.jpg', graph.astype(numpy.uint8))
