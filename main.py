@@ -9,14 +9,17 @@ import converter
 import finder
 
 
-def make_random_imgee(size):
+def make_random_imgee(size: tuple, num: int = 10):
     img = numpy.zeros([*size, 3], numpy.uint8)
+    img[:,:,0] = random.randint(0, 256)
+    img[:,:,1] = random.randint(0, 256)
+    img[:,:,2] = random.randint(0, 256)
 
-    for i in range(1000):
-        r = random.randint(0, int(max(size) / ((i+1)/4)))
+    for i in range(num):
+        r = random.randint(max(*size)//8, max(*size)//2)
         cv2.circle(img, (random.randint(-r, size[1] + r), random.randint(-r, size[0] + r)), r, [random.randint(0, 256) for i in range(3)], -1)
 
-    return img
+    return cv2.GaussianBlur(img, (19, 19), 512, 0)
 
 
 async def take_level_images(cam: finder.Camera, width: int, height: int, num: int = 50):
