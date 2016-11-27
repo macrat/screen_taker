@@ -22,7 +22,7 @@ def make_random_imgee(size: tuple, num: int = 10):
     return cv2.GaussianBlur(img, (19, 19), 512, 0)
 
 
-async def take_level_images(cam: finder.Camera, width: int, height: int, num: int = 50):
+async def take_random_images(cam: finder.Camera, width: int, height: int, num: int = 50):
     taker = finder.SimpleImagePhotoTaker(cam)
     taker.prepare()
 
@@ -49,7 +49,7 @@ async def take_level_images(cam: finder.Camera, width: int, height: int, num: in
 async def main(cam: finder.Camera, width: int, height: int):
     pcam = await finder.PerspectiveCamera.auto_create(cam, width, height)
 
-    ys, xs = await take_level_images(pcam, width, height)
+    ys, xs = await take_random_images(pcam, width, height)
 
     print('make linear function...')
     f = converter.LinearFunction.from_least_squares(cupy.array(xs), cupy.array(ys))
