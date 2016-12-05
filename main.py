@@ -1,7 +1,6 @@
 import asyncio
 import random
 
-import cupy
 import cv2
 import numpy
 
@@ -37,9 +36,6 @@ async def take_random_images(cam: finder.Camera, width: int, height: int, num: i
 
         result = await taker.take_async(img, 300)
 
-        cv2.imwrite('out/show/{0:04}.png'.format(i), img)
-        cv2.imwrite('out/saw/{0:04}.png'.format(i), result)
-
         inputs.append(img)
         results.append(result)
 
@@ -49,26 +45,37 @@ async def take_random_images(cam: finder.Camera, width: int, height: int, num: i
 async def main(cam: finder.Camera, width: int, height: int):
     pcam = await finder.PerspectiveCamera.auto_create(cam, width, height)
 
-    ys, xs = await take_random_images(pcam, width, height)
+    xs, ys = await take_random_images(pcam, width, height)
 
     print('make linear function...')
-    f = converter.LinearFunction.from_least_squares(cupy.array(xs), cupy.array(ys))
+    f = converter.LinearFunction.from_least_squares(xs, ys)
     print('done')
 
-    import pickle
     with open('f.pickle', 'wb') as fp:
-        pickle.dump(f, fp)
+        __import__('pickle').dump(f, fp)
 
     while True:
-        img = cupy.array(pcam.get(), numpy.uint8)
+        show = make_random_imgee((height, width), num=100)
+        cv2.namedWindow('screen', cv2.WINDOW_NORMAL)
+        cv2.setWindowProperty('screen', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+        cv2.imshow('screen', show)
 
-        img = f(img).get()
-        img[img < 0] = 0
-        img[img > 255] = 255
-        cv2.imshow('unwarp', img.astype(numpy.uint8))
+        expect = f(show)
+        exp_show = expect.copy()
+        exp_show[exp_show < 0] = 0
+        exp_show[exp_show > 255] = 255
+        cv2.imshow('expect', exp_show.astype(numpy.uint8))
 
-        finder.show_image()
-        await asyncio.sleep(16 / 1000)
+        for i in range(3 * 16):
+            img = pcam.get()
+
+            img = img - expect
+            img[img < 0] = 0
+            img[img > 255] = 255
+            cv2.imshow('diff', img.astype(numpy.uint8))
+
+            finder.show_image()
+            await asyncio.sleep(16 / 1000)
 
 
 if __name__ == '__main__':

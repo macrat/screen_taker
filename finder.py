@@ -39,8 +39,8 @@ class CameraMonitor(Camera):
         self.fps = fps
         self._img = None
 
-    def __del__(self):
-        cv2.destroyWindow(self.name)
+    #def __del__(self):
+    #    cv2.destroyWindow(self.name)
 
     def _get(self) -> numpy.array:
         self._img = super().get()
@@ -57,7 +57,7 @@ class CameraMonitor(Camera):
 
 
 class SimpleImagePhotoTaker:
-    def __init__(self, cam: Camera = None, name: str = 'image photo taker'):
+    def __init__(self, cam: Camera = None, name: str = 'screen'):
         if cam is None:
             self.cam = Camera()
         else:
@@ -91,7 +91,7 @@ class SimpleImagePhotoTaker:
 
 
 class MultipleTaker(SimpleImagePhotoTaker):
-    def __init__(self, imgs: tuple, cam: Camera = None, name: str = 'multiple taker'):
+    def __init__(self, imgs: tuple, cam: Camera = None, name: str = 'screen'):
         super().__init__(cam, name)
         self.imgs = imgs
         self.results = numpy.zeros([len(imgs), *cam.get_size(), 3], numpy.uint32)
@@ -115,7 +115,8 @@ class MultipleTaker(SimpleImagePhotoTaker):
 
 
 async def wait_for_return() -> None:
-    while wait_for_return._key%256 != ord('\n') and cv2.waitKey(1)%256 != ord('\n'):
+    keys = (ord('\n'), ord('n'))
+    while wait_for_return._key%256 not in keys and cv2.waitKey(1)%256 not in keys:
         await asyncio.sleep(0.001)
     wait_for_return._key = -1
 wait_for_return._key = -1

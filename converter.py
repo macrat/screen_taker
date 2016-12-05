@@ -1,19 +1,18 @@
 import typing
 
-import cupy
 import cv2
 import numpy
 
 
 class LinearFunction:
-    def __init__(self, a: typing.Union[numpy.array, cupy.array, int, float],
-                       b: typing.Union[numpy.array, cupy.array, int, float]):
+    def __init__(self, a: typing.Union[numpy.array, numpy.array, int, float],
+                       b: typing.Union[numpy.array, numpy.array, int, float]):
         self.a = a
         self.b = b
 
     @classmethod
-    def from_least_squares(cls, xs: typing.Union[numpy.array, cupy.array],
-                                ys: typing.Union[numpy.array, cupy.array]):
+    def from_least_squares(cls, xs: typing.Union[numpy.array, numpy.array],
+                                ys: typing.Union[numpy.array, numpy.array]):
         assert len(xs) == len(ys)
 
         n = len(xs)
@@ -33,5 +32,5 @@ class LinearFunction:
             (x2 * y - xy * x) / bottom,
         )
 
-    def __call__(self, xs: typing.Union[numpy.array, cupy.array, int, float]):
+    def __call__(self, xs: typing.Union[numpy.array, numpy.array, int, float]):
         return self.a * xs + self.b
