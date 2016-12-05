@@ -10,21 +10,26 @@ with open('f.pickle', 'rb') as fp:
     f = pickle.load(fp)
 
 
+print('generating coefficient image...')
 coefficient = f.a - f.a.min()
 coefficient /= coefficient.max()
 coefficient *= 255
 cv2.imwrite('coefficient.jpg', coefficient.astype(numpy.uint8))
 
 
+print('generating bias image...')
 bias = f.b - f.b.min()
 bias /= bias.max()
 bias *= 255
 cv2.imwrite('bias.jpg', bias.astype(numpy.uint8))
 
 
+print('calculating linear function...')
 xs = numpy.array([numpy.ones(f.a.shape) * i for i in range(256)], numpy.uint8)
 ys = numpy.array([f(x) for x in xs], numpy.uint8)
 
+
+print('drawing graph...')
 graph = numpy.zeros([256, 256, 3])
 
 for x in range(256):
